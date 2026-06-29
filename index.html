@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova Tab</title>
-    <style>
 
+    <style>
     * {
         box-sizing: border-box;
     }
@@ -36,27 +36,18 @@
 
         background: rgba(255, 255, 255, 0.08);
         color: white;
-        
+
         outline: none;
 
         backdrop-filter: blur(10px);
         transition: 0.2s ease;
 
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-
-        -webkit-font-smoothing: antialiased;
-
     }
 
     input:focus {
         border-color: rgba(255, 255, 255, 0.5);
         transform: scale(1.02);
-    }
-
-
-    button:hover {
-        transform: translateY(-2px);
-        background: rgba(255,  255, 255, 0.25);
     }
 
     p {
@@ -67,49 +58,105 @@
     #time {
         font-size: 48px;
         font-weight: bold;
-        margin: 0;
     }
 
     #date {
         font-size: 16px;
         opacity: 0.7;
-        margin: 0;
     }
-
     </style>
 </head>
+
 <body>
+    <p id="weather">Loading Weather......</p>
     <p id="date"></p>
     <p id="time"></p>
-    <input type="text" id="search" class="search">
 
+    <input type="text" id="search">
 
     <script>
+        const input = document.getElementById("search");
+        const date = document.getElementById("date");
+        const time = document.getElementById("time");
 
-        const input = document.getElementById("search")
-        const date = document.getElementById("date")
-        const time = document.getElementById("time")
+        function Search() {
+            const query = input.value.trim();
+            if (!query) return;
 
-        function Search(){
-            var query = input.value
+            if (query.startsWith("/git ")) {
+                const gitQuery = query.replace("/git ", "");
+                window.location.href =
+                    `https://github.com/search?q=${encodeURIComponent(gitQuery)}&type=repositories`;
+                return;
+            }
+
+            else if (query.startsWith("/ytb ")){
+                const ytbQuery = query.replace("/ytb ", "")
+                window.location.href = 
+                    `https://www.youtube.com/results?search_query=${encodeURIComponent(ytbQuery)}`;
+                return;
+            }
+
+            else if (query.startsWith("/r ")){
+                const rQuery = query.replace("/r ", "")
+                window.location.href = 
+                    `https://www.reddit.com/search/?q=${encodeURIComponent(rQuery)}`;
+                return;
+            }
+
+            else if (query.startsWith("/mail")){
+                window.location.href = 
+                    `https://mail.google.com/mail/u/0/#inbox`;
+                return;
+            }
+
+            else if (query.startsWith("/chat ")) {
+                const text = query.replace("/chat ", "");
+
+                window.location.href =
+                    `https://chat.openai.com/?q=${encodeURIComponent(text)}`;
+                return;
+            }
 
             window.location.href =
-            `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                `https://www.google.com/search?q=${encodeURIComponent(query)}`;
         }
 
         function updateClock() {
             const now = new Date();
-
             date.innerText = now.toLocaleDateString();
             time.innerText = now.toLocaleTimeString();
         }
 
+        async function getWeather() {
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                const res = await fetch(
+                     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
+                );
+                
+                const data = await res.json();
+
+                const temp = data.current_weather.temperature;
+
+                document.getElementById("weather").innerText = 
+                `Current location: ${temp}°C`;
+            }, () => {
+                document.getElementById("weather").innerText =
+                "Location permission denied";
+            }
+
+            );
+        }
+        getWeather();
         input.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
                 Search();
             }
         });
-        
+
         updateClock();
         setInterval(updateClock, 1000);
     </script>
