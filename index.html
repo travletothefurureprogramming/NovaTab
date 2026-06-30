@@ -4,161 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova Tab</title>
+    <link rel="stylesheet" href="styles/style.css">
 
-    <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-
-        height: 100vh;
-        margin: 0;
-
-        font-family: Inter;
-
-        background: linear-gradient(135deg, #1e2a2a, #0f1414);
-
-        gap: 16px;
-    }
-
-    input {
-        padding: 14px 16px;
-        width: 320px;
-        font-size: 16px;
-
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
-
-        background: rgba(255, 255, 255, 0.08);
-        color: white;
-
-        outline: none;
-
-        backdrop-filter: blur(10px);
-        transition: 0.2s ease;
-
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-    }
-
-    input:focus {
-        border-color: rgba(255, 255, 255, 0.5);
-        transform: scale(1.02);
-    }
-
-    p {
-        color: whitesmoke;
-        margin: 0;
-    }
-
-    #time {
-        font-size: 48px;
-        font-weight: bold;
-    }
-
-    #date {
-        font-size: 16px;
-        opacity: 0.7;
-    }
-    </style>
 </head>
 
 <body>
-    <p id="weather">Loading Weather......</p>
-    <p id="date"></p>
-    <p id="time"></p>
+    <div class="top">
+        <p id="weather">Loading weather…</p>
+        <p id="time"></p>
+        <p id="date"></p>
+    </div>
+    <div class="content">
+        <div class="to-do">
+                <h4>To‑Do</h4>
+                <ul id="tasks">
 
-    <input type="text" id="search">
+                </ul>
+                <button id="add_task">+ Add task</button>
+        </div>
+        <div class="middle">
+            <h1 id="title">NovaTab</h1>
+            <div class="search-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="search" placeholder="Search the web…">
+            </div>
+            <p class="hint"><span>/git</span> GitHub · <span>/ytb</span> YouTube · <span>/r</span> Reddit · <span>/mail</span> Gmail · <span>/chat</span> ChatGPT</p>
+        </div>
+        <div class="calendar">
+            <div class="calendar-header">
+                <button id="prevMonth">◀</button>
+                <h3 id="monthYear"></h3>
+                <button id="nextMonth">▶</button>
+            </div>
 
-    <script>
-        const input = document.getElementById("search");
-        const date = document.getElementById("date");
-        const time = document.getElementById("time");
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+        <div aria-hidden="true"></div>
+    </div>
 
-        function Search() {
-            const query = input.value.trim();
-            if (!query) return;
 
-            if (query.startsWith("/git ")) {
-                const gitQuery = query.replace("/git ", "");
-                window.location.href =
-                    `https://github.com/search?q=${encodeURIComponent(gitQuery)}&type=repositories`;
-                return;
-            }
-
-            else if (query.startsWith("/ytb ")){
-                const ytbQuery = query.replace("/ytb ", "")
-                window.location.href = 
-                    `https://www.youtube.com/results?search_query=${encodeURIComponent(ytbQuery)}`;
-                return;
-            }
-
-            else if (query.startsWith("/r ")){
-                const rQuery = query.replace("/r ", "")
-                window.location.href = 
-                    `https://www.reddit.com/search/?q=${encodeURIComponent(rQuery)}`;
-                return;
-            }
-
-            else if (query.startsWith("/mail")){
-                window.location.href = 
-                    `https://mail.google.com/mail/u/0/#inbox`;
-                return;
-            }
-
-            else if (query.startsWith("/chat ")) {
-                const text = query.replace("/chat ", "");
-
-                window.location.href =
-                    `https://chat.openai.com/?q=${encodeURIComponent(text)}`;
-                return;
-            }
-
-            window.location.href =
-                `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-        }
-
-        function updateClock() {
-            const now = new Date();
-            date.innerText = now.toLocaleDateString();
-            time.innerText = now.toLocaleTimeString();
-        }
-
-        async function getWeather() {
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-
-                const res = await fetch(
-                     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
-                );
-                
-                const data = await res.json();
-
-                const temp = data.current_weather.temperature;
-
-                document.getElementById("weather").innerText = 
-                `Current location: ${temp}°C`;
-            }, () => {
-                document.getElementById("weather").innerText =
-                "Location permission denied";
-            }
-
-            );
-        }
-        getWeather();
-        input.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") {
-                Search();
-            }
-        });
-
-        updateClock();
-        setInterval(updateClock, 1000);
-    </script>
+    <div class="bottom">
+        <ul id="linksList"></ul>
+        <ul>
+            <li><button id="toggleAddBtn" onclick="show_add()">Add link</button></li>
+        </ul>
+        <div class="links" id="links" hidden>
+            <input type="text" id="linkName" placeholder="Name (e.g. GitHub)">
+            <input type="text" id="linkUrl" placeholder="URL (e.g github.com)">
+            <button id="addLinkBtn">Add Link</button>
+        </div>
+    </div>
+    <script src="scripts/app.js"></script>
 </body>
 </html>
