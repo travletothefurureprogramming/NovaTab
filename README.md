@@ -4,6 +4,8 @@
 
 NovaTab combines search, productivity tools, weather updates, quick links, and a clean interface into one dashboard.
 
+![NovaTab](image.png)
+
 ---
 
 ## Features
